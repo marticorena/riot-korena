@@ -8,15 +8,15 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
-    --border: 214.3 31.8% 91.4%;
+    --background: 222 47% 7%;
+    --foreground: 213 31% 91%;
+    --border: 216 34% 15%;
   }
 
   .dark {
-    --background: 224 71% 4%;
+    --background: 222 47% 7%;
     --foreground: 213 31% 91%;
-    --border: 216 34% 17%;
+    --border: 216 34% 15%;
   }
 
   * {

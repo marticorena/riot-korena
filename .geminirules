@@ -1,0 +1,18 @@
+# Global AI Coding Instructions
+
+## General Rules
+1. **DRY (Don't Repeat Yourself):** Always look to factorize code. If two functions or components share significantly similar behavior, abstract the common logic into a shared helper function or component to increase maintainability.
+
+## Python (Backend)
+1. **Docstrings:** Always use Google-style docstrings for all functions, classes, and modules.
+2. **Typing:** Use strict, comprehensive type hints (`typing` module) for all function arguments and return types.
+3. **Complexity & Maintainability:** 
+   - Keep Cyclomatic Complexity under 10 (as defined by our Ruff mccabe config).
+   - Ensure a high Maintainability Index (similar to Radon standards).
+   - Keep functions modular with a low Lines of Code (LOC) count. Extract complex logic into helper functions.
+
+## React / TypeScript (Frontend)
+1. **Typing:** Provide strict TypeScript interfaces and types. Avoid `any`.
+2. **Documentation:** Use JSDoc comments for all React components and custom hooks to describe props and functionality.
+3. **Complexity:** Keep React components small, modular, and strictly focused on a single responsibility.
+4. **Style:** Write clean, modern, and beautiful UI code following the established global design system.

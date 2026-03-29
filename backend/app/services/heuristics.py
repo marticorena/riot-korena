@@ -1,3 +1,9 @@
+"""Heuristics Engine for analyzing raw Riot match data.
+
+This module processes League of Legends matches to extract player habits
+and recommend actionable coaching concepts.
+"""
+
 import logging
 from typing import Any, Dict
 
@@ -5,14 +11,23 @@ logger = logging.getLogger(__name__)
 
 
 class CoachingHeuristicsEngine:
-    def __init__(self):
+    """Core heuristics processing engine for player progression."""
+
+    def __init__(self) -> None:
+        """Initialize the Heuristics engine."""
         pass
 
     async def analyze_match(
         self, match_data: Dict[str, Any], timeline_data: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """
-        Phase 1 Heuristics Module: Parses timeline frames and identifies core Support habits.
+        """Execute Phase 1 heuristics parsing timeline frames and Support habits.
+
+        Args:
+            match_data (Dict[str, Any]): Raw match state from Riot API.
+            timeline_data (Dict[str, Any]): Expanded time-series events.
+
+        Returns:
+            Dict[str, Any]: Dictionary matching CoachingReport properties.
         """
         logger.info(
             "Running heuristics analysis on match and timeline structural data..."

@@ -1,5 +1,10 @@
-import uuid
+"""SQLAlchemy Domain Models.
+
+This module contains the ORM entity definitions reflecting the PostgreSQL schema.
+"""
+
 from datetime import datetime
+import uuid
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, text
 from sqlalchemy.dialects.postgresql import JSONB
@@ -9,6 +14,16 @@ from app.models.base import Base
 
 
 class Player(Base):
+    """Player ORM Model mapping to the players table.
+
+    Attributes:
+        puuid (str): The primary Riot unique identifier.
+        game_name (str): The Riot account game name.
+        tag_line (str): The Riot account tagline.
+        region (str): The routing region of the player.
+        reports (list[CoachingReport]): 1-to-many relationship mapping.
+    """
+
     __tablename__ = "players"
 
     puuid: Mapped[str] = mapped_column(String, primary_key=True)
@@ -23,6 +38,15 @@ class Player(Base):
 
 
 class MatchCache(Base):
+    """MatchCache ORM Model to store raw JSON payloads from Riot API.
+
+    Attributes:
+        match_id (str): The Riot Match ID.
+        raw_match_data (dict): The generic match structural dictionary payload.
+        raw_timeline_data (dict): The generic timeline dataframe equivalent payload.
+        analyzed (bool): Whether the heuristics engine has processed it.
+    """
+
     __tablename__ = "match_cache"
 
     match_id: Mapped[str] = mapped_column(String, primary_key=True)
@@ -34,6 +58,17 @@ class MatchCache(Base):
 
 
 class CoachingReport(Base):
+    """CoachingReport ORM Model storing the heuristics deductions.
+
+    Attributes:
+        id (str): Generated UUID for the report.
+        puuid (str): The player identifier link.
+        generated_at (datetime): Database generated timestamp.
+        critical_moments (dict): Filtered timestamp highlights.
+        habits (dict): Calculated habit metric deductions.
+        training_plan (dict): Textual instruction recommendations.
+    """
+
     __tablename__ = "coaching_reports"
 
     id: Mapped[str] = mapped_column(

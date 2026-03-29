@@ -1,6 +1,10 @@
+"""Main FastAPI entry point for the Support Coach MVP.
+
+This module initializes the FastAPI application, sets up CORS middleware,
+and includes the API routers.
 """
-Main FastAPI entry point for the Support Coach MVP.
-"""
+
+from typing import Dict, List
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +19,7 @@ app = FastAPI(
 )
 
 # CORS Configuration
-origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+origins: List[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,6 +33,10 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health", tags=["System"])
-async def health_check():
-    """Basic health check endpoint to verify API routing."""
+async def health_check() -> Dict[str, str]:
+    """Basic health check endpoint to verify API routing.
+
+    Returns:
+        Dict[str, str]: A dictionary containing the status and service name.
+    """
     return {"status": "ok", "service": "support-coach-api"}

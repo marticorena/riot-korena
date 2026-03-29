@@ -1,3 +1,8 @@
+"""Matches API endpoints.
+
+This module provides endpoints for ingesting and processing Match data.
+"""
+
 from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -16,10 +21,23 @@ async def ingest_match(
     match_data: Dict[str, Any],
     timeline_data: Dict[str, Any],
     db: AsyncSession = Depends(get_db),
-):
-    """
-    Ingest raw match arrays and structural timelines. Parses into heuristics engine
-    and directly provisions analytical reports into PostgreSQL.
+) -> Dict[str, Any]:
+    """Ingest raw match arrays and structural timelines.
+
+    Parses data into heuristics engine and directly provisions
+    analytical reports into PostgreSQL.
+
+    Args:
+        puuid (str): The Player Unique Identifier.
+        match_data (Dict[str, Any]): The raw match data from Riot API.
+        timeline_data (Dict[str, Any]): The raw timeline data from Riot API.
+        db (AsyncSession): The database session.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the status and the new report ID.
+
+    Raises:
+        HTTPException: If an error occurs during parsing or database insertion.
     """
     try:
         analysis_result = await heuristics_engine.analyze_match(

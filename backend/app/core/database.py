@@ -1,3 +1,9 @@
+"""Database connection and session management.
+
+This module initializes the SQLAlchemy asynchronous engine and session maker
+used throughout the application to interact with the database.
+"""
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
@@ -17,9 +23,3 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 Base = declarative_base()
-
-
-async def get_db():
-    """Dependency for providing a database session inside FastAPI routes."""
-    async with AsyncSessionLocal() as session:
-        yield session

@@ -1,9 +1,12 @@
-import React from 'react'
+
 import { Dashboard } from './features/dashboard/Dashboard'
+import { Layout } from './components/Layout'
 
 function App() {
   return (
-    <Dashboard />
+    <Layout>
+      <Dashboard />
+    </Layout>
   )
 }
 
