@@ -17,6 +17,19 @@ class PlayerBase(BaseModel):
     game_name: str
     tag_line: str
     region: str
+    summoner_level: Optional[int] = None
+    profile_icon_id: Optional[int] = None
+    summoner_id: Optional[str] = None
+
+
+class RankEntryResponse(BaseModel):
+    """Rank item definition fetched from League-V4."""
+    queueType: str
+    tier: Optional[str] = None
+    rank: Optional[str] = None
+    leaguePoints: Optional[int] = 0
+    wins: Optional[int] = 0
+    losses: Optional[int] = 0
 
 
 class PlayerResponse(PlayerBase):
@@ -28,6 +41,7 @@ class PlayerResponse(PlayerBase):
 class CoachingReportBase(BaseModel):
     """Base schema for abstracting the raw JSON payloads."""
 
+    role: Optional[str] = None
     critical_moments: Optional[Dict[str, Any]] = {}
     habits: Optional[Dict[str, Any]] = {}
     training_plan: Optional[Dict[str, Any]] = {}

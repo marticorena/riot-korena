@@ -20,6 +20,21 @@ export interface Player {
   game_name: string
   tag_line: string
   region: string
+  summoner_level?: number
+  profile_icon_id?: number
+  summoner_id?: string
+}
+
+/**
+ * Rank dictionary schema from League-V4
+ */
+export interface RankEntry {
+  queueType: string
+  tier?: string
+  rank?: string
+  leaguePoints?: number
+  wins?: number
+  losses?: number
 }
 
 /**
@@ -43,7 +58,14 @@ export const apiClient = {
    */
   async getPlayer(region: string, gameName: string, tagLine: string): Promise<Player> {
     const res = await fetch(`${BASE_URL}/players/${region}/${gameName}/${tagLine}`)
-    if (!res.ok) throw new Error('Failed to fetch player')
+    if (!res.ok) {
+      let errMsg = 'Failed to fetch player'
+      try {
+        const data = await res.json()
+        errMsg = data?.detail || errMsg
+      } catch (e) {}
+      throw new Error(errMsg)
+    }
     return res.json()
   },
 
@@ -67,11 +89,50 @@ export const apiClient = {
   /**
    * Retrieve all generated coaching reports for a player.
    * @param puuid - the unique player identifier.
+   * @param role - optional positional filter bounding queries.
    * @returns Array of Coaching Reports.
    */
-  async getReports(puuid: string): Promise<CoachingReport[]> {
-    const res = await fetch(`${BASE_URL}/reports/${puuid}`)
+  async getReports(puuid: string, role?: string): Promise<CoachingReport[]> {
+    const url = role ? `${BASE_URL}/reports/${puuid}?role=${role}` : `${BASE_URL}/reports/${puuid}`
+    const res = await fetch(url)
     if (!res.ok) throw new Error('Failed to fetch reports')
+    return res.json()
+  },
+
+  /**
+   * Fast load recent match summaries for the dashboard history view.
+   */
+  async getMatchHistory(puuid: string, region: string, role?: string): Promise<any[]> {
+    const url = role ? `${BASE_URL}/players/${region}/by-puuid/${puuid}/history?role=${role}` : `${BASE_URL}/players/${region}/by-puuid/${puuid}/history`
+    const res = await fetch(url)
+    if (!res.ok) throw new Error('Failed to fetch history')
+    return res.json()
+  },
+
+  /**
+   * Fetch specific ranked stats nested independently.
+   * @param region - The Riot routing region.
+   * @param puuid - The player's unique identifier.
+   */
+  async getPlayerRanks(region: string, puuid: string): Promise<RankEntry[]> {
+    const res = await fetch(`${BASE_URL}/players/${region}/by-puuid/${puuid}/ranks`)
+    if (!res.ok) {
+      // Return empty instead of crashing the UI entirely if rankings fail
+      console.warn("Could not fetch rankings.")
+      return []
+    }
+    return res.json()
+  },
+
+  /**
+   * Auto-fetch and analyze the latest match for a player.
+   */
+  async analyzeMatch(region: string, puuid: string, role?: string): Promise<CoachingReport> {
+    const url = role ? `${BASE_URL}/matches/analyze/${region}/${puuid}?role=${role}` : `${BASE_URL}/matches/analyze/${region}/${puuid}`
+    const res = await fetch(url, {
+      method: 'POST'
+    })
+    if (!res.ok) throw new Error('Failed to analyze match')
     return res.json()
   }
 }

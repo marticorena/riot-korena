@@ -91,8 +91,8 @@ class RiotClient:
                     response = await client.get(url, headers=self.headers)
                     if response.status_code == 429:
                         retry_after = int(response.headers.get("Retry-After", 5))
-                        logger.warning(
-                            f"Riot 429 Rate Limit directly triggered. Halting for {retry_after}s."
+                        logger.error(
+                            f"[QUOTA EXCEEDED] Riot 429 Rate Limit directly triggered. Halting for {retry_after}s."
                         )
                         await asyncio.sleep(retry_after)
                         continue
@@ -100,12 +100,17 @@ class RiotClient:
                     response.raise_for_status()
                     return response.json()
                 except httpx.HTTPStatusError as exc:
-                    logger.error(
-                        f"HTTP error {exc.response.status_code} mapped from {url}"
-                    )
+                    status = exc.response.status_code
+                    if status in (401, 403):
+                        logger.error(f"[AUTH ERROR] Expired or Bad Riot API Key used for {url} (Status {status})")
+                    else:
+                        logger.error(f"[HTTP ERROR] Status {status} mapped from {url}")
+                    
+                    if status in (401, 403):
+                        raise
                     return None
                 except Exception as e:
-                    logger.error(f"Connection error requesting {url}: {str(e)}")
+                    logger.error(f"[CONNECTION ERROR] Requesting {url}: {str(e)}")
                     return None
         return None
 
@@ -142,11 +147,21 @@ class RiotClient:
         return await self._get(url, routing)
 
     async def get_match_ids_by_puuid(
-        self, puuid: str, region: str, count: int = 5
+        self, puuid: str, region: str, count: int = 5, queue_type: str = "ranked"
     ) -> Optional[list[str]]:
-        """Resolve Match History IDs for a specific PUUID."""
+        """Resolve Match History IDs for a specific PUUID.
+
+        Args:
+            puuid (str): The Player Unique Identifier.
+            region (str): The player's routing region.
+            count (int): Number of match IDs to return.
+            queue_type (str): Riot queue filter. 'ranked' for Solo/Flex only.
+                              Use 'normal', 'tourney', or '' for unfiltered.
+        """
         routing = self._get_regional_routing(region)
         url = f"https://{routing}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count={count}"
+        if queue_type:
+            url += f"&type={queue_type}"
         return await self._get(url, routing)
 
     async def get_match_by_id(
@@ -163,6 +178,22 @@ class RiotClient:
         """Fetch deeply nested event timeline for a specific Match ID."""
         routing = self._get_regional_routing(region)
         url = f"https://{routing}.api.riotgames.com/lol/match/v5/matches/{match_id}/timeline"
+        return await self._get(url, routing)
+
+    async def get_ranked_info_by_summoner_id(
+        self, summoner_id: str, region: str
+    ) -> Optional[List[Dict[str, Any]]]:
+        """Fetch Ranked LP and Tier data by local summoner ID."""
+        routing = region.lower()
+        url = f"https://{routing}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}"
+        return await self._get(url, routing)
+
+    async def get_ranked_info_by_puuid(
+        self, puuid: str, region: str
+    ) -> Optional[List[Dict[str, Any]]]:
+        """Fetch Ranked LP and Tier data directly via PUUID (New 2024 spec)."""
+        routing = region.lower()
+        url = f"https://{routing}.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}"
         return await self._get(url, routing)
 
 

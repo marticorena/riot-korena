@@ -6,7 +6,7 @@ This module contains the ORM entity definitions reflecting the PostgreSQL schema
 from datetime import datetime
 import uuid
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -30,6 +30,9 @@ class Player(Base):
     game_name: Mapped[str] = mapped_column(String, nullable=False)
     tag_line: Mapped[str] = mapped_column(String, nullable=False)
     region: Mapped[str] = mapped_column(String, nullable=False)
+    summoner_level: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    profile_icon_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    summoner_id: Mapped[str | None] = mapped_column(String, nullable=True)
 
     # Relationships mapped dynamically
     reports: Mapped[list["CoachingReport"]] = relationship(
@@ -75,6 +78,7 @@ class CoachingReport(Base):
         String, primary_key=True, default=lambda: str(uuid.uuid4())
     )
     puuid: Mapped[str] = mapped_column(ForeignKey("players.puuid"), nullable=False)
+    role: Mapped[str | None] = mapped_column(String, nullable=True)
     generated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow, server_default=text("now()")
     )

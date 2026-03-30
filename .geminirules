@@ -2,6 +2,7 @@
 
 ## General Rules
 1. **DRY (Don't Repeat Yourself):** Always look to factorize code. If two functions or components share significantly similar behavior, abstract the common logic into a shared helper function or component to increase maintainability.
+2. **No Magic Numbers:** Avoid using hardcoded "magic" numbers or strings in code. Extract all meaningful hardcoded numbers, thresholds, and configuration values into clearly named constants.
 
 ## Python (Backend)
 1. **Docstrings:** Always use Google-style docstrings for all functions, classes, and modules.
